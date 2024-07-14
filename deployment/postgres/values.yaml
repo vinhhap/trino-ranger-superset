@@ -1,0 +1,26 @@
+image:
+  registry: docker.io
+  repository: bitnami/postgresql
+  tag: "16.3.0"
+  pullPolicy: IfNotPresent
+auth:
+  enablePostgresUser: true
+  database: "postgres"
+  postgresPassword: "super-secret-password-postgres" # Replace this password
+architecture: standalone
+containerPorts:
+  postgresql: 5432
+postgresqlDataDir: /bitnami/postgresql/data
+primary:
+  name: primary
+  resourcesPreset: "large"
+  service:
+    type: ClusterIP
+    ports:
+      postgresql: 5432
+  persistence:
+    enabled: true
+  persistentVolumeClaimRetentionPolicy:
+    enabled: true
+    whenScaled: Retain
+    whenDeleted: Retain

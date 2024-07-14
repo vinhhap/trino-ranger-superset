@@ -1,0 +1,92 @@
+image:
+  repository: qnguyen3496/superset
+  tag: "4.0.1"
+  pullPolicy: IfNotPresent
+
+initImage:
+  repository: apache/superset
+  tag: dockerize
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8088
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+  path: /
+  pathType: Prefix
+  hosts:
+    - superset.example.com # Change this to your domain name for the Superset service
+
+supersetNode:
+  replicas:
+    enabled: true
+    replicaCount: 1
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  connections:
+    redis_host: '{{ .Release.Name }}-redis-headless'
+    redis_port: "6379"
+    redis_user: ""
+    redis_cache_db: "1"
+    redis_celery_db: "0"
+    redis_ssl:
+      enabled: false
+    db_host: postgres-trino-postgresql-hl
+    db_port: "5432"
+    db_user: superset
+    db_pass: supoer-secret-password-postgres-superset
+    db_name: superset
+  resources:
+    limits:
+      cpu: 4
+      memory: 4Gi
+    requests:
+      cpu: 1
+      memory: 1Gi
+
+supersetWorker:
+  replicas:
+    enabled: true
+    replicaCount: 1
+  autoscaling:
+    enabled: false
+  resources:
+    limits:
+      cpu: 4
+      memory: 4Gi
+    requests:
+      cpu: 1
+      memory: 1Gi
+
+init:
+  enabled: true
+  loadExamples: false
+  createAdmin: true
+  adminUser:
+    username: admin
+    firstname: Superset
+    lastname: Admin
+    email: admin@superset.com
+    password: super-secret-password-superset-admin
+
+postgresql:
+  enabled: false
+
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: false
+
+extraSecretEnv:
+  SUPERSET_SECRET_KEY: 'super-secret-key-superset'

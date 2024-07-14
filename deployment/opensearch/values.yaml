@@ -1,0 +1,32 @@
+clusterName: opensearch
+fullnameOverride: opensearch
+image:
+  pullPolicy: IfNotPresent
+  repository: opensearchproject/opensearch
+  tag: "2.15.0"
+opensearchJavaOpts: "-Xmx1g -Xms1g"
+persistence:
+  enabled: true
+  size: 10Gi
+protocol: http
+config:
+  opensearch.yml: |
+    plugins.security.disabled: true
+singleNode: true
+resources:
+  requests:
+    cpu: 1
+    memory: 1Gi
+  limits:
+    cpu: 2
+    memory: 2Gi
+initResources:
+  requests:
+    cpu: 0.5
+    memory: 512Mi
+  limits:
+    cpu: 1
+    memory: 1Gi
+service:
+  type: ClusterIP
+httpPort: 9200

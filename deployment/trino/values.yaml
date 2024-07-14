@@ -1,0 +1,142 @@
+image:
+  repository: qnguyen3496/trino-ranger
+  tag: "451"
+  pullPolicy: Always
+
+securityContext:
+  runAsUser: 0
+  runAsGroup: 0
+  
+server:
+  workers: 1
+  node:
+    environment: dev_trino
+  log:
+    trino:
+      level: INFO
+  config:
+    path: /tmp/trino
+    http:
+      port: 8080
+    authenticationType: "PASSWORD"
+    query:
+      maxMemory: "4GB"
+  autoscaling:
+    enabled: false
+
+additionalConfigProperties:
+  - internal-communication.shared-secret=super-secret-communication-shared-secret
+  - http-server.process-forwarded=true
+  - hide-inaccessible-columns=true
+
+additionalCatalogs:
+  jmx: |
+    connector.name=memory
+  memory: |
+    connector.name=memory
+    memory.max-data-per-node=128MB
+
+envFrom: []
+
+service:
+  type: ClusterIP
+  port: 8080
+
+auth:
+  passwordAuth: "admin:encrypted-password-with-htpasswd"
+
+coordinator:
+  jvm:
+    maxHeapSize: "8G"
+    gcMethod:
+      type: "UseG1GC"
+      g1:
+        heapRegionSize: "32M"
+  config:
+    memory:
+      heapHeadroomPerNode: ""
+    query:
+      maxMemoryPerNode: "1GB"
+  additionalJVMConfig:
+    - -XX:+UnlockDiagnosticVMOptions
+    - -XX:G1NumCollectionsKeepPinned=10000000
+  resources:
+    limits:
+      cpu: 4
+      memory: 6Gi
+    requests:
+      cpu: 1
+      memory: 2Gi
+  livenessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  readinessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  additionalConfigFiles:
+    is_coordinator.txt: |
+      true
+  secretMounts:
+    - name: trino-ranger-plugin-config-secret
+      secretName: trino-ranger-plugin-config-secret
+      path: /tmp/ranger_plugin_config/
+
+worker:
+  jvm:
+    maxHeapSize: "8G"
+    gcMethod:
+      type: "UseG1GC"
+      g1:
+        heapRegionSize: "32M"
+  config:
+    memory:
+      heapHeadroomPerNode: ""
+    query:
+      maxMemoryPerNode: "1GB"
+  additionalJVMConfig:
+    - -XX:+UnlockDiagnosticVMOptions
+    - -XX:G1NumCollectionsKeepPinned=10000000
+  resources:
+    limits:
+      cpu: 4
+      memory: 6Gi
+    requests:
+      cpu: 1
+      memory: 2Gi
+  livenessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  readinessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  lifecycle:
+    preStop:
+      exec:
+        command: ["/bin/sh", "-c", "curl -v -X PUT -d '\"SHUTTING_DOWN\"' -H \"Content-type: application/json\" http://localhost:8081/v1/info/state"]
+  terminationGracePeriodSeconds: 30
+  additionalConfigFiles:
+    is_coordinator.txt: |
+      false
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+  hosts:
+    - host: trino.example.com # Change this to your domain name for the Trino service
+      paths:
+        - path: /
+          pathType: Prefix

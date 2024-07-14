@@ -1,0 +1,26 @@
+rangerAdmin:
+  image:
+    repository: qnguyen3496/ranger-admin
+    tag: 3.0.0-SNAPSHOT
+    pullPolicy: IfNotPresent
+  installPropertiesSecret: ranger-admin-secret
+  resources:
+    requests:
+      cpu: 1
+      memory: 2Gi
+    limits:
+      cpu: 4
+      memory: 6Gi
+service:
+  port: 6080
+ingress:
+  rangerAdmin:
+    enabled: true
+    className: traefik
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web
+    hosts:
+      - host: ranger.example.com # Change this to your domain name for the ranger-admin service
+        paths:
+          - path: /
+            pathType: Prefix
