@@ -12,7 +12,9 @@ rangerAdmin:
       cpu: 4
       memory: 6Gi
 service:
-  port: 6080
+  rangerAdmin:
+    type: ClusterIP
+    port: 6080
 ingress:
   rangerAdmin:
     enabled: true

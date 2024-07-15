@@ -41,15 +41,8 @@ supersetNode:
     db_host: postgres-trino-postgresql-hl
     db_port: "5432"
     db_user: superset
-    db_pass: supoer-secret-password-postgres-superset
+    db_pass: super-secret-password-superset-admin
     db_name: superset
-  resources:
-    limits:
-      cpu: 4
-      memory: 4Gi
-    requests:
-      cpu: 1
-      memory: 1Gi
 
 supersetWorker:
   replicas:
@@ -57,13 +50,6 @@ supersetWorker:
     replicaCount: 1
   autoscaling:
     enabled: false
-  resources:
-    limits:
-      cpu: 4
-      memory: 4Gi
-    requests:
-      cpu: 1
-      memory: 1Gi
 
 init:
   enabled: true

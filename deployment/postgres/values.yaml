@@ -5,8 +5,10 @@ image:
   pullPolicy: IfNotPresent
 auth:
   enablePostgresUser: true
-  database: "postgres"
-  postgresPassword: "super-secret-password-postgres" # Replace this password
+  database: "superset" # Create a new database used by Superset later on
+  username: "superset" # Create a new user used by Superset later on
+  password: "super-secret-password-superset-admin" # Change password used by "superset" user
+  postgresPassword: "super-secret-password-postgres" # Change password used by "postgres" user
 architecture: standalone
 containerPorts:
   postgresql: 5432

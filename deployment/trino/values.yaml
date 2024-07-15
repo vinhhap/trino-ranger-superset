@@ -1,7 +1,7 @@
 image:
   repository: qnguyen3496/trino-ranger
-  tag: "451"
-  pullPolicy: Always
+  tag: "452"
+  pullPolicy: IfNotPresent
 
 securityContext:
   runAsUser: 0
@@ -43,7 +43,7 @@ service:
   port: 8080
 
 auth:
-  passwordAuth: "admin:encrypted-password-with-htpasswd"
+  passwordAuth: "admin:$2y$10$el/kJNE3Oe84ku0hYtzZgegyhJf8L9jL3V6NI3B7VrZsk4VWEzu8K"
 
 coordinator:
   jvm:
